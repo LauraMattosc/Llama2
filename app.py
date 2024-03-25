@@ -2,6 +2,10 @@ import streamlit as st
 import os
 from transformers import pipeline
 
+# Acessa o token da Hugging Face armazenado como variável de ambiente
+hugging_face_token = st.secrets["HUGGINGFACE_TOKEN"]
+os.environ["HUGGINGFACE_HUB_TOKEN"] = hugging_face_token
+
 # Set page title
 st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
 
