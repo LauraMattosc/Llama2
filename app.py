@@ -24,6 +24,7 @@ st.sidebar.subheader('Parâmetros do Modelo')
 temperature = st.sidebar.slider('Temperatura', 0.01, 5.0, 0.1, 0.01)
 top_p = st.sidebar.slider('Top P', 0.01, 1.0, 0.9, 0.01)
 max_tokens = st.sidebar.slider('Tokens Máximos', 64, 4096, 512, 8)
+max_length = st.sidebar.slider('Comprimento Máximo', 64, 4096, 512, 8)  
 repetition_penalty = st.sidebar.slider('Penalidade de Repetição', 1.0, 2.0, 1.1, 0.1)
 
 # Função para limpar o histórico de chat
