@@ -67,15 +67,29 @@ def generate_llama2_response(prompt_input):
         return None
 
 
-# Handling chat interaction
+# Função para limpar o histórico de chat
+def clear_chat_history():
+    st.session_state.messages = [{"role": "assistant", "content": "Como posso te ajudar hoje?"}]
+    # Força a aplicação a rerenderizar após limpar o histórico
+    st.experimental_rerun()
+
+st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
+
+# Exibição de mensagens de chat existentes
+def display_chat_messages():
+    if "messages" in st.session_state:
+        for message in st.session_state["messages"]:
+            role = message["role"]
+            content = message["content"]
+            st.write(f"{role.capitalize()}: {content}")
+
 def handle_chat_interaction():
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    user_input = st.text_input("Your message:", key="user_input")
+    user_input = st.text_input("Your message:", key="user_input", on_change=clear_input_box)
     if user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
-        # st.session_state.user_input = ""  # Removido para evitar o erro
         st.write("User: " + user_input)  # Display user message
 
         # Generate and display response
@@ -85,10 +99,7 @@ def handle_chat_interaction():
                 st.session_state.messages.append({"role": "assistant", "content": response})
                 st.write("Assistant: " + response)
 
-
-# Display existing chat messages
-for message in st.session_state.get('messages', []):
-    role = message["role"]
-    st.write(f"{role.capitalize()}: {message['content']}")
+# Chama a função de exibição de mensagens dentro do seu loop principal ou onde faz sentido na lógica da aplicação
+display_chat_messages()
 
 handle_chat_interaction()
