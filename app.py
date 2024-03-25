@@ -18,7 +18,7 @@ with st.sidebar:
 selected_model = "meta-llama/Llama-2-7b-chat-hf"  # Placeholder, replace with actual model selection logic
 
 # Load the chosen LLaMA model with pipeline
-pipe = pipeline("text-generation", model=selected_model, use_auth_token=hugging_face_token)
+pipe = pipeline("text-generation", model=f"meta-llama/{selected_model}", temperature=temperature, max_length=max_length, use_auth_token=hugging_face_token)
 
 # Store LLM generated responses
 if "messages" not in st.session_state:
