@@ -2,23 +2,19 @@ import streamlit as st
 import os
 from transformers import pipeline
 
-# Acessa o token da Hugging Face armazenado como variável de ambiente
-hugging_face_token = st.secrets["HUGGINGFACE_TOKEN"]
-os.environ["HUGGINGFACE_HUB_TOKEN"] = hugging_face_token
-
-
-# Definindo o token da Hugging Face como uma variável de ambiente para uso pela biblioteca transformers
-os.environ["HUGGINGFACE_HUB_TOKEN"] = hugging_face_token
-if hugging_face_token is None:
-    raise ValueError("Token da Hugging Face não encontrado. Certifique-se de configurar a variável de ambiente 'HUGGINGFACE_TOKEN'.")
-else:
-    os.environ["HUGGINGFACE_HUB_TOKEN"] = hugging_face_token  # Define o token de acesso
-
-    # Agora, você pode carregar seu modelo com a pipeline
-    pipe = pipeline("text-generation", model="meta-llama/Llama-2-7b-chat-hf", temperature=0.7)
-
-# App title
+# Set page title
 st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
+
+# Try to access the Hugging Face token stored as an environment variable
+try:
+    hugging_face_token = st.secrets["HUGGINGFACE_TOKEN"]
+    if not hugging_face_token:
+        raise ValueError("Hugging Face token is empty. Make sure it's set correctly in Streamlit Secrets.")
+except KeyError:
+    raise ValueError("Token da Hugging Face não encontrado. Certifique-se de configurar a variável 'HUGGINGFACE_TOKEN' no Streamlit Secrets.")
+
+# Set the Hugging Face token as an environment variable for use by the transformers library
+os.environ["HUGGINGFACE_HUB_TOKEN"] = hugging_face_token
 
 # Sidebar configuration for model parameters
 with st.sidebar:
@@ -26,7 +22,6 @@ with st.sidebar:
 
     st.subheader('Models and parameters')
     selected_model = st.selectbox('Choose a Llama2 model', ['Llama-2-7b-chat-hf', 'Llama-2-13b-chat-hf'], key='selected_model')
-
     temperature = st.slider('temperature', min_value=0.01, max_value=5.0, value=0.1, step=0.01)
     max_length = st.slider('max_length', min_value=32, max_value=128, value=120, step=8)
     
