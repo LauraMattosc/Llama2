@@ -1,3 +1,4 @@
+# Importações
 import streamlit as st
 import os
 import replicate
@@ -16,21 +17,15 @@ with st.sidebar:
         if not (replicate_api.startswith('r_') and len(replicate_api) == 40):
             st.warning('Por favor, insira suas credenciais.', icon='⚠️')
         else:
-            st.success('Continue inserindo sua mensagem de prompt!', icon='➡️')
+            st.success('Pronto para inserir sua mensagem!', icon='➡️')
             os.environ['REPLICATE_API_TOKEN'] = replicate_api
 
-# Parâmetros do modelo
-st.subheader('Modelos e parâmetros')
-temperature = st.sidebar.slider('Temperatura', min_value=0.01, max_value=5.0, value=0.1, step=0.01)
-top_p = st.sidebar.slider('Top P', min_value=0.01, max_value=1.0, value=0.9, step=0.01)
-max_length = st.sidebar.slider('Comprimento máximo', min_value=64, max_value=4096, value=512, step=8)
-repetition_penalty = st.sidebar.slider('Penalidade de repetição', min_value=1.0, max_value=2.0, value=1.1, step=0.1)
-
-st.markdown("📘 Aprenda a construir este aplicativo neste [blog](https://blog.streamlit.io/how-to-build-a-llama-2-chatbot)")
-
-# Função para limpar o histórico de chat
-def clear_chat_history():
-    st.session_state['messages'] = [{"role": "assistant", "content": "Como posso te ajudar hoje?"}]
+# Parâmetros do modelo na barra lateral
+st.sidebar.subheader('Parâmetros do Modelo')
+temperature = st.sidebar.slider('Temperatura', 0.01, 5.0, 0.1, 0.01)
+top_p = st.sidebar.slider('Top P', 0.01, 1.0, 0.9, 0.01)
+max_length = st.sidebar.slider('Comprimento Máximo', 64, 4096, 512, 8)
+repetition_penalty = st.sidebar.slider('Penalidade de Repetição', 1.0, 2.0, 1.1, 0.1)
 
 # Botão para limpar o histórico de chat
 st.sidebar.button('Limpar Histórico de Chat', on_click=clear_chat_history, key='clear_history_button')
@@ -79,11 +74,13 @@ def handle_chat_interaction():
                 st.session_state['messages'].append({"role": "assistant", "content": response})
                 st.write("Assistente: " + response)
 
-# Display existing chat messages
-for message in st.session_state.get('messages', []):
-    role = message["role"]
-    content = message["content"]
-    st.write(f"{role.capitalize()}: {content}")
+# Exibir mensagens de chat existentes
+def display_messages():
+    for message in st.session_state.get('messages', []):
+        if message["role"] == "user":
+            st.text_area("Usuário:", value=message["content"], height=75, key=f"user_msg_{message['content']}")
+        else:  # Assistente
+            st.text_area("Assistente:", value=message["content"], height=150, key=f"assistant_msg_{message['content']}")
 
+display_messages()
 handle_chat_interaction()
-
