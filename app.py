@@ -1,15 +1,13 @@
 import streamlit as st
-from transformers import pipeline, HfFolder
+import os
+from transformers import pipeline
 
 # Set page title
 st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
 
-# Assuming you have a secure way to input your token in the app, e.g., via an input field or st.secrets for personal use
-# WARNING: Directly embedding tokens in code is risky and not recommended for shared or public code.
+# Assuming you have already set the HUGGINGFACE_HUB_TOKEN environment variable as shown earlier:
 hugging_face_token = st.secrets["HUGGINGFACE_TOKEN"]
-
-# Authenticate with Hugging Face using the token
-HfFolder.save_token(hugging_face_token)  # This sets the token for the current session
+os.environ["HUGGINGFACE_HUB_TOKEN"] = hugging_face_token
 
 # Sidebar configuration for model parameters
 with st.sidebar:
