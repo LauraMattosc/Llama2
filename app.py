@@ -80,11 +80,11 @@ def handle_chat_interaction():
 
 # Exibir mensagens de chat existentes
 def display_messages():
-    for message in st.session_state.get('messages', []):
+    for index, message in enumerate(st.session_state.get('messages', [])):
         if message["role"] == "user":
-            st.text_area("Usuário:", value=message["content"], height=75, key=f"user_msg_{message['content']}")
+            st.text_area("Usuário:", value=message["content"], height=75, key=f"user_msg_{index}")
         else:  # Assistente
-            st.text_area("Assistente:", value=message["content"], height=150, key=f"assistant_msg_{message['content']}")
+            st.text_area("Assistente:", value=message["content"], height=150, key=f"assistant_msg_{index}")
 
 display_messages()
 handle_chat_interaction()
