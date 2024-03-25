@@ -9,17 +9,19 @@ st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
 replicate_client = None
 
 with st.sidebar:
-    st.title('🦙💬 Llama 2 Chatbot')
+    st.title(' Llama 2 Chatbot')
     st.write('This chatbot is created using the open-source Llama 2 LLM model from Meta.')
+
+    # Improved logic for handling API token
     if 'REPLICATE_API_TOKEN' in st.secrets:
-        st.success('API key already provided!', icon='✅')
         replicate_api_token = st.secrets['REPLICATE_API_TOKEN']
-        replicate_client = replicate.Client(api_token=replicate_api_token)  # Configura o cliente do Replicate com o token da API
+        replicate_client = replicate.Client(api_token=replicate_api_token)
+        st.success('API key already provided!', icon='✅')
     else:
         replicate_api_token = st.text_input('Enter Replicate API token:', type='password')
         if replicate_api_token and (replicate_api_token.startswith('r8_') and len(replicate_api_token) == 40):
-            replicate_client = replicate.Client(api_token=replicate_api_token)  # Configura o cliente do Replicate com o token da API fornecido
-            st.success('Proceed to entering your prompt message!', icon='👉')
+            replicate_client = replicate.Client(api_token=replicate_api_token)
+            st.success('API key configured successfully!', icon='✅')
         else:
             st.warning('Please enter a valid API token!', icon='⚠️')
         else:
