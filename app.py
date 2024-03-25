@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import replicate
 
 # App title
 st.set_page_config(page_title="🦙 Llama 2 Chatbot")
