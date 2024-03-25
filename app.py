@@ -2,7 +2,7 @@ import streamlit as st
 import os
 
 # App title
-st.set_page_config(page_title="🦙 Llama 2 Chatbot")
+st.set_page_config(page_title="🦙 Llama 2 Chatbot- Teste Laura")
 
 # Replacing sidebar
 with st.sidebar:
