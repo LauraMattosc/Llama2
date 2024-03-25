@@ -2,11 +2,11 @@ import streamlit as st
 import os
 
 # App title
-st.set_page_config(page_title="🦙 Llama 2 Chatbot- Teste Laura")
+st.set_page_config(page_title="🦙 Llama 2 Chatbot")
 
 # Replacing sidebar
 with st.sidebar:
-    st.title("🦙 Llama 2 Chatbot")
+    st.title("🦙 Llama 2 Chatbot- Teste Laura")
     if 'REPLICATE_API_TOKEN' in st.secrets:
         st.success('API key already provided!', icon='✅')
         replicate_api = st.secrets['REPLICATE_API_TOKEN']
