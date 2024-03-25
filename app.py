@@ -1,5 +1,21 @@
 import streamlit as st
-from transformers import pipeline
+import os
+from transformers import pipeline, set_access_token
+
+# Get the Hugging Face token from environment variables
+hugging_face_token = os.getenv("HUGGINGFACE_TOKEN")
+
+# Check if the token is available
+if hugging_face_token is not None:
+    set_access_token(hugging_face_token)
+    # Now, you can load your model with the pipeline
+    pipe = pipeline("text-generation", model="meta-llama/Llama-2-7b-chat-hf", temperature=0.7)
+else:
+    raise ValueError("Hugging Face token not found. Please set the HUGGINGFACE_TOKEN environment variable.")
+
+
+# Now, you can load your model with the pipeline
+pipe = pipeline("text-generation", model="meta-llama/Llama-2-7b-chat-hf", temperature=0.7)
 
 # App title
 st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
