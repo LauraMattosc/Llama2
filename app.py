@@ -62,7 +62,7 @@ def handle_chat_interaction():
     user_input = st.text_input("Your message:", key="user_input")
     if user_input:
         st.session_state.messages.append({"role": "user", "content": user_input})
-        st.session_state.user_input = ""  # Clear input box after message is sent
+        # st.session_state.user_input = ""  # Removido para evitar o erro
         st.write("User: " + user_input)  # Display user message
 
         # Generate and display response
@@ -71,6 +71,7 @@ def handle_chat_interaction():
             if response is not None:
                 st.session_state.messages.append({"role": "assistant", "content": response})
                 st.write("Assistant: " + response)
+
 
 # Display existing chat messages
 for message in st.session_state.get('messages', []):
