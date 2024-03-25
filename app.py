@@ -80,11 +80,21 @@ def handle_chat_interaction():
 
 # Exibir mensagens de chat existentes
 def display_messages():
-    for index, message in enumerate(st.session_state.get('messages', [])):
-        if message["role"] == "user":
-            st.text_area("Usuário:", value=message["content"], height=75, key=f"user_msg_{index}")
-        else:  # Assistente
-            st.text_area("Assistente:", value=message["content"], height=150, key=f"assistant_msg_{index}")
+    # Usando st.container para melhor controle de layout
+    with st.container():
+        for index, message in enumerate(st.session_state.get('messages', [])):
+            role = "Usuário:" if message["role"] == "user" else "Assistente:"
+            # st.markdown para permitir formatação customizada e estilização via CSS
+            st.markdown(
+                f"""
+                <div style="margin: 5px 0px; padding: 10px; border-radius: 5px; border: 1px solid #cccccc;">
+                    <h4>{role}</h4>
+                    <p>{message["content"]}</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
 
 display_messages()
 handle_chat_interaction()
