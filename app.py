@@ -44,12 +44,6 @@ st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
 # Function for generating LLama2 response
 def generate_llama2_response(prompt_input):
-    string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond to the user's prompts."
-    for message in st.session_state.messages:
-        # The rest of the code seems to be cut off in the image provided
-        pass  # Placeholder for the continuation of the code
-# Function for generating LLama2 response
-def generate_llama2_response(prompt_input):
     string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond to user prompts."
     for dict_message in st.session_state.messages:
         if dict_message["role"] == "user":
@@ -57,11 +51,11 @@ def generate_llama2_response(prompt_input):
         else:
             string_dialogue += "Assistant: " + dict_message["content"] + "\n\n"
     output = replicate.run(llm,
-                           input={"prompt": f"{string_dialogue}{prompt_input} Assistant: ", 
-                                  "temperature":temperature, 
-                                  "top_p":top_p, 
-                                  "max_length":max_length, 
-                                  "repetition_penalty":repetition_penalty})
+                           input={"prompt": f"{string_dialogue}{prompt_input} Assistant: ",
+                                  "temperature": temperature,
+                                  "top_p": top_p,
+                                  "max_length": max_length,
+                                  "repetition_penalty": repetition_penalty})
     return output
 
 # User-provided prompt
@@ -82,4 +76,3 @@ if st.session_state.messages[-1]["role"] != "assistant":
             placeholder.markdown(full_response)
     message = {"role": "assistant", "content": full_response}
     st.session_state.messages.append(message)
-
