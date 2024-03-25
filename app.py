@@ -35,7 +35,7 @@ def clear_chat_history():
 
 st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
-# Function to generate LLama2 response
+# Função modificada para gerar resposta do LLama2 com streaming
 def generate_llama2_response(prompt_input):
     string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond to user prompts."
     for dict_message in st.session_state.messages:
@@ -43,16 +43,29 @@ def generate_llama2_response(prompt_input):
         content = dict_message["content"]
         string_dialogue += f"{role.capitalize()}: {content}\n\n"
     try:
-        output = replicate.run(llm,
-                               input={"prompt": f"{string_dialogue}{prompt_input} Assistant: ",
-                                      "temperature": temperature,
-                                      "top_p": top_p,
-                                      "max_length": max_length,
-                                      "repetition_penalty": repetition_penalty})
-        return output
+        # Usar replicate.stream para iniciar a geração de resposta com streaming
+        for event in replicate.stream(
+            "meta/llama-2-7b-chat",  # Nome do modelo (verifique se está correto e acessível)
+            input={
+                "debug": False,
+                "top_p": top_p,
+                "prompt": f"{string_dialogue}{prompt_input} Assistant: ",
+                "temperature": temperature,
+                "system_prompt": "You are a helpful, respectful and honest assistant...",
+                "max_new_tokens": max_length,  # Ajuste conforme necessário
+                "min_new_tokens": -1,  # Pode ajustar conforme necessário
+                "prompt_template": "[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n\n{prompt} [/INST]",
+                "repetition_penalty": repetition_penalty
+            },
+        ):
+            # Processar e exibir cada evento de resposta do streaming aqui
+            # Por exemplo, imprimir cada parte da resposta à medida que é recebida
+            st.write(str(event), end="")
+            # Pode precisar ajustar a maneira como a resposta é manipulada e exibida em sua aplicação
     except Exception as e:
         st.error(f"An error occurred: {e}")
         return None
+
 
 # Handling chat interaction
 def handle_chat_interaction():
