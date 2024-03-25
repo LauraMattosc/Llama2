@@ -51,7 +51,7 @@ def generate_llama2_response(prompt_input):
                 "prompt": f"{string_dialogue}{prompt_input} Assistant: ",
                 "temperature": temperature,
                 "system_prompt": "Você é um assistente útil, respeitoso e honesto...",
-                "max_new_tokens": max_length,
+                "max_new_tokens": max_length,  # Usando max_length conforme definido na barra lateral
                 "min_new_tokens": -1,
                 "prompt_template": "[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n\n{prompt} [/INST]",
                 "repetition_penalty": repetition_penalty
