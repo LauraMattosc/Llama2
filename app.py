@@ -7,6 +7,8 @@ st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
 
 # Inicializa o cliente do Replicate sem o token da API configurado inicialmente
 replicate_client = None
+replicate_api_token = st.secrets['REPLICATE_API_TOKEN']
+
 
 with st.sidebar:
     st.title(' Llama 2 Chatbot')
