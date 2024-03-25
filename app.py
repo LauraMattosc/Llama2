@@ -1,4 +1,3 @@
-# Importações
 import streamlit as st
 import os
 import replicate
@@ -24,15 +23,16 @@ with st.sidebar:
 st.sidebar.subheader('Parâmetros do Modelo')
 temperature = st.sidebar.slider('Temperatura', 0.01, 5.0, 0.1, 0.01)
 top_p = st.sidebar.slider('Top P', 0.01, 1.0, 0.9, 0.01)
-max_length = st.sidebar.slider('Comprimento Máximo', 64, 4096, 512, 8)
+max_tokens = st.sidebar.slider('Tokens Máximos', 64, 4096, 512, 8)
 repetition_penalty = st.sidebar.slider('Penalidade de Repetição', 1.0, 2.0, 1.1, 0.1)
 
-# Definição da função para limpar o histórico de chat
+# Função para limpar o histórico de chat
 def clear_chat_history():
     st.session_state['messages'] = [{"role": "assistant", "content": "Como posso te ajudar hoje?"}]
 
 # Botão para limpar o histórico de chat
 st.sidebar.button('Limpar Histórico de Chat', on_click=clear_chat_history, key='clear_history_button')
+
 
 # Função para gerar resposta do Llama2
 def generate_llama2_response(prompt_input):
