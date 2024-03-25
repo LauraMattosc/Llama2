@@ -48,3 +48,25 @@ def generate_llama2_response(prompt_input):
     for message in st.session_state.messages:
         # The rest of the code seems to be cut off in the image provided
         pass  # Placeholder for the continuation of the code
+# Function for generating LLama2 response
+def generate_llama2_response(prompt_input):
+    string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond to user prompts."
+    for dict_message in st.session_state.messages:
+        if dict_message["role"] == "user":
+            string_dialogue += "User: " + dict_message["content"] + "\n\n"
+        else:
+            string_dialogue += "Assistant: " + dict_message["content"] + "\n\n"
+    output = replicate.run(llm,
+                           input={"prompt": f"{string_dialogue}{prompt_input} Assistant: ", 
+                                  "temperature":temperature, 
+                                  "top_p":top_p, 
+                                  "max_length":max_length, 
+                                  "repetition_penalty":repetition_penalty})
+    return output
+
+# User-provided prompt
+if prompt := st.chat_input(disabled=not replicate_api):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.write(prompt)
+
