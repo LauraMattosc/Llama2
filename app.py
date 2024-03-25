@@ -24,7 +24,6 @@ with st.sidebar:
             st.warning('Please enter a valid API token!', icon='⚠️')
         else:
             st.success('Proceed to entering your prompt message!', icon='👉')
-    os.environ['REPLICATE_API_TOKEN'] = replicate_api
 
     st.subheader('Models and parameters')
     selected_model = st.sidebar.selectbox('Choose a Llama2 model', ['Llama2-7B', 'Llama2-13B'], key='selected_model')
@@ -107,7 +106,6 @@ if st.session_state.messages[-1]["role"] != "assistant":
             full_response = ''
             for item in response:
                 full_response += item
-                placeholder.markdown(full_response)
             placeholder.markdown(full_response)
     message = {"role": "assistant", "content": full_response}
     st.session_state.messages.append(message)
