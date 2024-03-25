@@ -12,7 +12,11 @@ os.environ["HUGGINGFACE_HUB_TOKEN"] = hugging_face_token
 # Sidebar configuration for model parameters
 with st.sidebar:
     st.title('🦙💬 Llama 2 Chatbot')
-    # Model selection and other UI elements...
+    st.subheader('Models and parameters')
+    selected_model = st.selectbox('Choose a Llama2 model', ['Llama-2-7b-chat-hf', 'Llama-2-13b-chat-hf'], key='selected_model')
+    temperature = st.slider('temperature', min_value=0.01, max_value=5.0, value=0.1, step=0.01)
+    max_length = st.slider('max_length', min_value=32, max_value=128, value=120, step=8)
+    st.markdown('📖 Learn more about LLaMA models on Hugging Face!')
 
 # Assuming `selected_model` is set by the user in the UI
 selected_model = "meta-llama/Llama-2-7b-chat-hf"  # Placeholder, replace with actual model selection logic
