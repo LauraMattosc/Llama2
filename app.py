@@ -31,13 +31,13 @@ st.markdown("📘 Learn how to build this app in this [blog](https://blog.stream
 
 # Function to clear chat history
 def clear_chat_history():
-    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+    st.session_state.messages = [{"role": "assistant", "content": "Como posso te ajudar hoje?"}]
 
 st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
-# Função modificada para gerar resposta do LLama2 com streaming
+# Gerar resposta do LLama2
 def generate_llama2_response(prompt_input):
-    string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond to user prompts."
+    string_dialogue = "Você é um assistente útil. Você não responde como 'Usuário' ou finge ser 'Usuário'. Você apenas responde aos comandos do usuário."
     for dict_message in st.session_state.messages:
         role = dict_message["role"]
         content = dict_message["content"]
