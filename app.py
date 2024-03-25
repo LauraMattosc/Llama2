@@ -1,101 +1,77 @@
 import streamlit as st
-import os
 import replicate
+import os
 
-# Configuração da página
-st.set_page_config(page_title="🦙 Llama 2 Chatbot")
+# App title
+st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
 
-# Barra lateral
+# Replicate Credentials
 with st.sidebar:
-    st.title("🦙 Llama 2 Chatbot - Teste Laura")
-    replicate_api = st.secrets.get('REPLICATE_API_TOKEN', '')
-    if replicate_api:
-        st.success('Chave da API já fornecida!', icon='✅')
+    st.title('🦙💬 Llama 2 Chatbot')
+    if 'REPLICATE_API_TOKEN' in st.secrets:
+        st.success('API key already provided!', icon='✅')
+        replicate_api = st.secrets['REPLICATE_API_TOKEN']
     else:
-        replicate_api = st.text_input('Insira o token da API Replicate:', type='password')
-        if not (replicate_api.startswith('r_') and len(replicate_api) == 40):
-            st.warning('Por favor, insira suas credenciais.', icon='⚠️')
+        replicate_api = st.text_input('Enter Replicate API token:', type='password')
+        if not (replicate_api.startswith('r8_') and len(replicate_api)==40):
+            st.warning('Please enter your credentials!', icon='⚠️')
         else:
-            st.success('Pronto para inserir sua mensagem!', icon='➡️')
-            os.environ['REPLICATE_API_TOKEN'] = replicate_api
+            st.success('Proceed to entering your prompt message!', icon='👉')
+    os.environ['REPLICATE_API_TOKEN'] = replicate_api
 
-# Parâmetros do modelo na barra lateral
-st.sidebar.subheader('Parâmetros do Modelo')
-temperature = st.sidebar.slider('Temperatura', 0.01, 5.0, 0.1, 0.01)
-top_p = st.sidebar.slider('Top P', 0.01, 1.0, 0.9, 0.01)
-max_tokens = st.sidebar.slider('Tokens Máximos', 64, 4096, 512, 8)
-max_length = st.sidebar.slider('Comprimento Máximo', 64, 4096, 512, 8)  
-repetition_penalty = st.sidebar.slider('Penalidade de Repetição', 1.0, 2.0, 1.1, 0.1)
+    st.subheader('Models and parameters')
+    selected_model = st.sidebar.selectbox('Choose a Llama2 model', ['Llama2-7B', 'Llama2-13B'], key='selected_model')
+    if selected_model == 'Llama2-7B':
+        llm = 'a16z-infra/llama7b-v2-chat:4f0a4744c7295c024a1de15e1a63c880d3da035fa1f49bfd344fe076074c8eea'
+    elif selected_model == 'Llama2-13B':
+        llm = 'a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5'
+    temperature = st.sidebar.slider('temperature', min_value=0.01, max_value=5.0, value=0.1, step=0.01)
+    top_p = st.sidebar.slider('top_p', min_value=0.01, max_value=1.0, value=0.9, step=0.01)
+    max_length = st.sidebar.slider('max_length', min_value=32, max_value=128, value=120, step=8)
+    st.markdown('📖 Learn how to build this app in this [blog](https://blog.streamlit.io/how-to-build-a-llama-2-chatbot/)!')
 
-# Função para limpar o histórico de chat
+# Store LLM generated responses
+if "messages" not in st.session_state.keys():
+    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+
+# Display or clear chat messages
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.write(message["content"])
+
 def clear_chat_history():
-    st.session_state['messages'] = [{"role": "assistant", "content": "Como posso te ajudar hoje?"}]
+    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
-# Botão para limpar o histórico de chat
-st.sidebar.button('Limpar Histórico de Chat', on_click=clear_chat_history, key='clear_history_button')
-
-
-# Função para gerar resposta do Llama2
+# Function for generating LLaMA2 response. Refactored from https://github.com/a16z-infra/llama2-chatbot
 def generate_llama2_response(prompt_input):
-    string_dialogue = "Você é um assistente útil. Você não responde como 'Usuário' ou finge ser 'Usuário'. Você apenas responde aos comandos do usuário."
-    for dict_message in st.session_state.get('messages', []):
-        role = dict_message["role"]
-        content = dict_message["content"]
-        string_dialogue += f"{role.capitalize()}: {content}\n\n"
-    try:
-        for event in replicate.stream(
-            "meta/llama-2-7b-chat",
-            input={
-                "debug": False,
-                "top_p": top_p,
-                "prompt": f"{string_dialogue}{prompt_input} Assistant: ",
-                "temperature": temperature,
-                "system_prompt": "Você é um assistente útil, respeitoso e honesto...",
-                "max_new_tokens": max_length,  # Usando max_length conforme definido na barra lateral
-                "min_new_tokens": -1,
-                "prompt_template": "[INST] <<SYS>>\n{system_prompt}\n<</SYS>>\n\n{prompt} [/INST]",
-                "repetition_penalty": repetition_penalty
-            },
-        ):
-            st.write(str(event))
-    except Exception as e:
-        st.error(f"Ocorreu um erro: {e}")
-        return None
+    string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond once as 'Assistant'."
+    for dict_message in st.session_state.messages:
+        if dict_message["role"] == "user":
+            string_dialogue += "User: " + dict_message["content"] + "\n\n"
+        else:
+            string_dialogue += "Assistant: " + dict_message["content"] + "\n\n"
+    output = replicate.run('a16z-infra/llama13b-v2-chat:df7690f1994d94e96ad9d568eac121aecf50684a0b0963b25a41cc40061269e5', 
+                           input={"prompt": f"{string_dialogue} {prompt_input} Assistant: ",
+                                  "temperature":temperature, "top_p":top_p, "max_length":max_length, "repetition_penalty":1})
+    return output
 
-# Handling chat interaction
-def handle_chat_interaction():
-    if "messages" not in st.session_state:
-        st.session_state['messages'] = []
-    
-    user_input = st.text_input("Sua mensagem:", key="user_input")
-    if user_input:
-        st.session_state['messages'].append({"role": "user", "content": user_input})
-        st.write("Usuário: " + user_input)  # Display user message
+# User-provided prompt
+if prompt := st.chat_input(disabled=not replicate_api):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.write(prompt)
 
-        # Generate and display response
-        with st.spinner("Pensando..."):
-            response = generate_llama2_response(user_input)
-            if response is not None:
-                st.session_state['messages'].append({"role": "assistant", "content": response})
-                st.write("Assistente: " + response)
-
-# Exibir mensagens de chat existentes
-def display_messages():
-    # Usando st.container para melhor controle de layout
-    with st.container():
-        for index, message in enumerate(st.session_state.get('messages', [])):
-            role = "Usuário:" if message["role"] == "user" else "Assistente:"
-            # st.markdown para permitir formatação customizada e estilização via CSS
-            st.markdown(
-                f"""
-                <div style="margin: 5px 0px; padding: 10px; border-radius: 5px; border: 1px solid #cccccc;">
-                    <h4>{role}</h4>
-                    <p>{message["content"]}</p>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-
-display_messages()
-handle_chat_interaction()
+# Generate a new response if last message is not from assistant
+if st.session_state.messages[-1]["role"] != "assistant":
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            response = generate_llama2_response(prompt)
+            placeholder = st.empty()
+            full_response = ''
+            for item in response:
+                full_response += item
+                placeholder.markdown(full_response)
+            placeholder.markdown(full_response)
+    message = {"role": "assistant", "content": full_response}
+    st.session_state.messages.append(message)
