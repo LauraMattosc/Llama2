@@ -24,6 +24,9 @@ with st.sidebar:
             st.success('API key configured successfully!', icon='✅')
         else:
             st.warning('Please enter a valid API token!', icon='⚠️')
+    
+    os.environ['REPLICATE_API_TOKEN'] = replicate_api_token
+
 
     st.subheader('Models and parameters')
     selected_model = st.sidebar.selectbox('Choose a Llama2 model', ['Llama2-7B', 'Llama2-13B'], key='selected_model')
