@@ -3,8 +3,12 @@ import os
 from transformers import pipeline
 
 # Acessa o token da Hugging Face armazenado como variável de ambiente
-hugging_face_token = os.getenv("HUGGINGFACE_TOKEN")
+hugging_face_token = st.secrets["HUGGINGFACE_TOKEN"]
+os.environ["HUGGINGFACE_HUB_TOKEN"] = hugging_face_token
 
+
+# Definindo o token da Hugging Face como uma variável de ambiente para uso pela biblioteca transformers
+os.environ["HUGGINGFACE_HUB_TOKEN"] = hugging_face_token
 if hugging_face_token is None:
     raise ValueError("Token da Hugging Face não encontrado. Certifique-se de configurar a variável de ambiente 'HUGGINGFACE_TOKEN'.")
 else:
