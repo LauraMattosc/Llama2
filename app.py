@@ -1,52 +1,50 @@
 import streamlit as st
 import os
 from transformers import pipeline
+import requests
 
-# Set page title
+# Configuração da página
 st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
 
-# Assuming you have already set the HUGGINGFACE_HUB_TOKEN environment variable as shown earlier:
-hugging_face_token = st.secrets["HUGGINGFACE_TOKEN"]
-os.environ["HUGGINGFACE_HUB_TOKEN"] = hugging_face_token
-
-# Sidebar configuration for model parameters
+# Barra lateral
 with st.sidebar:
-    st.title('🦙💬 Llama 2 Chatbot')
-    st.subheader('Models and parameters')
-    selected_model = st.selectbox('Choose a Llama2 model', ['Llama-2-7b-chat-hf', 'Llama-2-13b-chat-hf'], key='selected_model')
-    temperature = st.slider('temperature', min_value=0.01, max_value=5.0, value=0.1, step=0.01)
-    max_length = st.slider('max_length', min_value=32, max_value=128, value=120, step=8)
-    st.markdown('📖 Learn more about LLaMA models on Hugging Face!')
+    st.title("🦙💬 Llama 2 Chatbot")
+    st.subheader('Modelos e parâmetros')
+    selected_model = st.selectbox('Escolha um modelo Llama2', ['Llama-2-7b-chat-hf', 'Llama-2-13b-chat-hf'])
+    temperature = st.slider('Temperatura', 0.01, 5.0, 0.1, 0.01)
+    max_length = st.slider('Comprimento máximo', 32, 128, 120, 8)
 
-# Load the chosen LLaMA model with pipeline
-pipe = pipeline("text-generation", model=f"meta-llama/{selected_model}", temperature=temperature, max_length=max_length, use_auth_token=hugging_face_token)
+# Assume que HUGGINGFACE_HUB_TOKEN está nas secrets do Streamlit
+hugging_face_token = st.secrets["HUGGINGFACE_HUB_TOKEN"]
 
-# Store LLM generated responses
-if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+# Carregar o modelo LLaMA escolhido com pipeline
+pipe = pipeline(
+    "text-generation", 
+    model=f"meta-llama/{selected_model}", 
+    temperature=temperature, 
+    max_length=max_length, 
+    use_auth_token=hugging_face_token
+)
 
-# Display or clear chat messages
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
-
-def clear_chat_history():
-    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
-st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
-
-# Function for generating LLaMA2 response
+# Função para gerar resposta do LLaMA2
 def generate_llama2_response(prompt_input):
-    string_dialogue = " ".join([m["content"] for m in st.session_state.messages if m["role"] == "user"])
-    responses = pipe(string_dialogue, max_length=max_length, temperature=temperature)
-    return responses[0]['generated_text'].split("Assistant: ")[-1].strip() # Simplified response parsing
+    responses = pipe(prompt_input, max_length=max_length, temperature=temperature)
+    return responses[0]['generated_text'].split("Assistant: ")[-1].strip()  # Simplificar a análise da resposta
 
-# User-provided prompt
-if prompt := st.chat_input("Enter your message:"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.spinner("Thinking..."):
-        response = generate_llama2_response(prompt)
+# Input do usuário e exibição das mensagens
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
+
+with st.container():
+    if st.session_state.messages:
+        for message in st.session_state.messages:
+            st.write(f"{message['role']}: {message['content']}")
+
+    user_input = st.text_input("Sua mensagem:")
+    if user_input:
+        st.session_state.messages.append({"role": "user", "content": user_input})
+        response = generate_llama2_response(user_input)
         st.session_state.messages.append({"role": "assistant", "content": response})
 
-for message in st.session_state.messages[-2:]:  # Display only the latest interaction for brevity
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
+# Botão para limpar histórico de chat
+st.sidebar.button('Limpar Histórico de Chat', on_click=lambda: st.session_state.messages.clear())
