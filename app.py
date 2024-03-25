@@ -56,7 +56,7 @@ def generate_llama2_response(prompt_input):
                 "repetition_penalty": repetition_penalty
             },
         ):
-            st.write(str(event), end="")
+            st.write(str(event))
     except Exception as e:
         st.error(f"Ocorreu um erro: {e}")
         return None
