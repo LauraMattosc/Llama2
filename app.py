@@ -18,9 +18,6 @@ with st.sidebar:
     max_length = st.slider('max_length', min_value=32, max_value=128, value=120, step=8)
     st.markdown('📖 Learn more about LLaMA models on Hugging Face!')
 
-# Assuming `selected_model` is set by the user in the UI
-selected_model = "meta-llama/Llama-2-7b-chat-hf"  # Placeholder, replace with actual model selection logic
-
 # Load the chosen LLaMA model with pipeline
 pipe = pipeline("text-generation", model=f"meta-llama/{selected_model}", temperature=temperature, max_length=max_length, use_auth_token=hugging_face_token)
 
